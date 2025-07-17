@@ -15,7 +15,7 @@ struct WriteSpeedTest {
   let verify: Bool
 
   init(targetDirectory: String = ".",
-       sizeRatio: Double = 1.0,
+       sizeRatio: Double = 0.9,
        chunkSize: Int = 10 * 1024 * 1024,
        outputFile: String = "result.csv",
        recordIntervalBytes: Int = 1 * 1024 * 1024 * 1024,
@@ -369,7 +369,7 @@ func printUsage() {
   print("Usage: ssd_write_test [options]")
   print("Options:")
   print("  -d, --directory <path>     Target directory (default: current directory)")
-  print("  -r, --ratio <0.0-1.0>      Size ratio of available space to use (default: 1.0)")
+  print("  -r, --ratio <0.0-1.0>      Size ratio of available space to use (default: 0.9)")
   print("  -c, --chunk-size <bytes>   Chunk size in bytes (default: 10MiB)")
   print("  -i, --interval <bytes>     Record interval in bytes (default: 1GiB)")
   print("  -o, --output <file>        Output CSV file (default: result.csv)")
@@ -380,7 +380,7 @@ func printUsage() {
 func parseArguments() -> WriteSpeedTest? {
   let args = CommandLine.arguments
   var targetDirectory = "."
-  var sizeRatio = 1.0
+  var sizeRatio = 0.9
   var chunkSize = 10 * 1024 * 1024
   var outputFile = "result.csv"
   var recordIntervalBytes = 1 * 1024 * 1024 * 1024
