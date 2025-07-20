@@ -11,20 +11,17 @@ struct WriteSpeedTest {
   let sizeRatio: Double
   let chunkSize: Int
   let outputFile: String
-  let recordIntervalBytes: Int
   let verify: Bool
 
   init(targetDirectory: String = ".",
-       sizeRatio: Double = 0.9,
+       sizeRatio: Double = 1.0,
        chunkSize: Int = 10 * 1024 * 1024,
        outputFile: String = "result.csv",
-       recordIntervalBytes: Int = 1 * 1024 * 1024 * 1024,
        verify: Bool = false) {
     self.targetDirectory = targetDirectory
     self.sizeRatio = sizeRatio
     self.chunkSize = chunkSize
     self.outputFile = outputFile
-    self.recordIntervalBytes = recordIntervalBytes
     self.verify = verify
   }
 }
@@ -225,7 +222,6 @@ func runTest(config: WriteSpeedTest) {
   print("Target directory: \(config.targetDirectory)")
   print("Size ratio: \(config.sizeRatio * 100)%")
   print("Chunk size: \(config.chunkSize) bytes")
-  print("Record interval: \(config.recordIntervalBytes) bytes")
   print("Data verification: \(config.verify ? "enabled" : "disabled")")
   print("Output file: \(config.outputFile)")
 
@@ -287,7 +283,7 @@ func runTest(config: WriteSpeedTest) {
     let chunkEndTime = CFAbsoluteTimeGetCurrent()
     totalBytesWritten += UInt64(config.chunkSize)
 
-    if totalBytesWritten - lastRecordedBytes >= UInt64(config.recordIntervalBytes) {
+    if totalBytesWritten - lastRecordedBytes >= UInt64(config.chunkSize) {
       let intervalTime = (chunkEndTime - lastRecordedTime) * 1000
       let intervalBytes = totalBytesWritten - lastRecordedBytes
       let intervalSpeedMBps = (Double(intervalBytes) / (1024 * 1024)) / (chunkEndTime - lastRecordedTime)
@@ -369,9 +365,8 @@ func printUsage() {
   print("Usage: ssd_write_test [options]")
   print("Options:")
   print("  -d, --directory <path>     Target directory (default: current directory)")
-  print("  -r, --ratio <0.0-1.0>      Size ratio of available space to use (default: 0.9)")
+  print("  -r, --ratio <0.0-1.0>      Size ratio of available space to use (default: 1.0)")
   print("  -c, --chunk-size <bytes>   Chunk size in bytes (default: 10MiB)")
-  print("  -i, --interval <bytes>     Record interval in bytes (default: 1GiB)")
   print("  -o, --output <file>        Output CSV file (default: result.csv)")
   print("  -v, --verify               Verify data after write (default: disabled)")
   print("  -h, --help                 Show this help message")
@@ -380,10 +375,9 @@ func printUsage() {
 func parseArguments() -> WriteSpeedTest? {
   let args = CommandLine.arguments
   var targetDirectory = "."
-  var sizeRatio = 0.9
+  var sizeRatio = 1.0
   var chunkSize = 10 * 1024 * 1024
   var outputFile = "result.csv"
-  var recordIntervalBytes = 1 * 1024 * 1024 * 1024
   var verify = false
 
   var i = 1
@@ -428,19 +422,6 @@ func parseArguments() -> WriteSpeedTest? {
         print("Error: Missing value for \(arg)")
         return nil
       }
-    case "-i", "--interval":
-      if i + 1 < args.count {
-        if let interval = Int(args[i + 1]), interval > 0 {
-          recordIntervalBytes = interval
-          i += 1
-        } else {
-          print("Error: Invalid record interval. Must be a positive integer")
-          return nil
-        }
-      } else {
-        print("Error: Missing value for \(arg)")
-        return nil
-      }
     case "-o", "--output":
       if i + 1 < args.count {
         outputFile = args[i + 1]
@@ -465,7 +446,6 @@ func parseArguments() -> WriteSpeedTest? {
     sizeRatio: sizeRatio,
     chunkSize: chunkSize,
     outputFile: outputFile,
-    recordIntervalBytes: recordIntervalBytes,
     verify: verify
   )
 }

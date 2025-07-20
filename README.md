@@ -1,6 +1,6 @@
 # SSD Sustained Write Speed Test
 
-Sustained write speed test for an SSD, written in Swift.
+Sustained write speed test for an SSD, written in Swift and Rust.
 
 ## Building
 
@@ -19,7 +19,6 @@ make
 - `-d, --directory <path>` - Target directory (default: current directory)
 - `-r, --ratio <0.0-1.0>` - Size ratio of available space to use (default: 0.9)
 - `-c, --chunk-size <bytes>` - Chunk size in bytes (default: 10485760 = 10MB)
-- `-i, --interval <bytes>` - Record interval in bytes (default: 1073741824 = 1GB)
 - `-o, --output <file>` - Output CSV file (default: result.csv)
 - `-v, --verify` - Enable data verification (default: disabled)
 - `-h, --help` - Show help message
